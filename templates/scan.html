@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Scan X-Ray{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-12">
+
+    <!-- Page Header -->
+    <div class="text-center mb-10 animate-fade-in">
+        <h1 class="text-3xl sm:text-4xl font-display font-bold text-white mb-3">
+            <i class="fa-solid fa-x-ray text-cyan-400 mr-2"></i>
+            <span data-i18n="scan_title">X-Ray Analysis</span>
+        </h1>
+        <p class="text-gray-400" data-i18n="scan_subtitle">Upload an X-ray image or use your camera for instant AI fracture detection</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+
+        <!-- ═══ LEFT: Upload Section ═══ -->
+        <div class="animate-slide-up">
+            <div class="bg-medical-card/60 backdrop-blur-xl border border-medical-border/50 rounded-3xl p-8 h-full">
+
+                <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-cyan-400"></i>
+                    <span data-i18n="upload_title">Upload X-Ray Image</span>
+                </h2>
+
+                <form method="POST" action="/scan/upload" enctype="multipart/form-data" id="upload-form">
+
+                    <!-- Drag & Drop Zone -->
+                    <div id="drop-zone" class="relative border-2 border-dashed border-medical-border/50 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-cyan-500/50 hover:bg-cyan-500/5 mb-6"
+                         onclick="document.getElementById('xray-input').click()">
+
+                        <!-- Scan line animation -->
+                        <div class="scan-line-overlay hidden" id="scan-line"></div>
+
+                        <div id="drop-content">
+                            <i class="fa-solid fa-cloud-arrow-up text-4xl text-gray-500 mb-4"></i>
+                            <p class="text-gray-300 font-medium mb-1" data-i18n="drag_drop">Drag & Drop your X-ray here</p>
+                            <p class="text-gray-500 text-sm" data-i18n="or_click">or click to browse files</p>
+                            <p class="text-gray-600 text-xs mt-3">PNG, JPG, JPEG • Max 16MB</p>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div id="preview-container" class="hidden">
+                            <img id="image-preview" src="" alt="Preview" class="max-h-64 mx-auto rounded-xl shadow-lg">
+                            <p id="file-name" class="text-cyan-400 text-sm mt-3 font-medium"></p>
+                        </div>
+
+                        <input type="file" name="xray_image" id="xray-input" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
+                    </div>
+
+                    <!-- Body Part Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2" data-i18n="body_part">Body Part</label>
+                        <select name="body_part" id="body-part-select" class="input-field">
+                            <option value="Unknown">-- Select Body Part --</option>
+                            <option value="Hand">🖐️ Hand</option>
+                            <option value="Wrist">🤚 Wrist</option>
+                            <option value="Arm">💪 Arm</option>
+                            <option value="Elbow">🦾 Elbow</option>
+                            <option value="Shoulder">🦴 Shoulder</option>
+                            <option value="Leg">🦵 Leg</option>
+                            <option value="Knee">🦿 Knee</option>
+                            <option value="Ankle">🦶 Ankle</option>
+                            <option value="Foot">👣 Foot</option>
+                            <option value="Hip">🏥 Hip</option>
+                            <option value="Spine">🔬 Spine</option>
+                            <option value="Rib">🫁 Rib</option>
+                            <option value="Skull">🧠 Skull</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="scan-submit-btn" class="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            disabled>
+                        <i class="fa-solid fa-brain mr-2"></i>
+                        <span data-i18n="analyze_btn">Analyze with AI</span>
+                    </button>
+
+                    <!-- Loading indicator -->
+                    <div id="scan-loading" class="hidden mt-4 text-center">
+                        <div class="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                            <div class="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                            <span class="text-cyan-400 text-sm font-medium" data-i18n="analyzing">Analyzing X-ray with AI...</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══ RIGHT: Camera Section ═══ -->
+        <div class="animate-slide-up" style="animation-delay: 0.15s">
+            <div class="bg-medical-card/60 backdrop-blur-xl border border-medical-border/50 rounded-3xl p-8 h-full">
+
+                <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-camera text-neon-green"></i>
+                    <span data-i18n="camera_title">Live Camera Scanner</span>
+                </h2>
+
+                <!-- Camera Feed -->
+                <div class="relative rounded-2xl overflow-hidden bg-black/50 border border-medical-border/30 mb-6" style="min-height: 300px;">
+                    <video id="camera-feed" class="w-full hidden rounded-2xl" autoplay playsinline></video>
+
+                    <!-- Camera OFF state -->
+                    <div id="camera-off" class="flex flex-col items-center justify-center py-16">
+                        <div class="w-20 h-20 rounded-full bg-gray-800/50 flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-video-slash text-3xl text-gray-600"></i>
+                        </div>
+                        <p class="text-gray-500 text-sm" data-i18n="camera_off">Camera is off</p>
+                    </div>
+
+                    <!-- Scan overlay -->
+                    <div id="camera-scan-overlay" class="absolute inset-0 hidden">
+                        <div class="absolute inset-4 border-2 border-cyan-400/50 rounded-xl"></div>
+                        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-scan-line"></div>
+                    </div>
+
+                    <!-- Hidden canvas for capture -->
+                    <canvas id="camera-canvas" class="hidden"></canvas>
+                </div>
+
+                <!-- Camera Controls -->
+                <div class="flex gap-3">
+                    <button id="camera-start-btn" onclick="startCamera()" class="flex-1 py-3 rounded-xl font-semibold text-neon-green border border-neon-green/30 hover:bg-neon-green/10 transition-all">
+                        <i class="fa-solid fa-play mr-2"></i>
+                        <span data-i18n="start_camera">Start Camera</span>
+                    </button>
+                    <button id="camera-capture-btn" onclick="captureAndAnalyze()" class="flex-1 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 shadow-lg shadow-green-500/20 transition-all disabled:opacity-50" disabled>
+                        <i class="fa-solid fa-camera mr-2"></i>
+                        <span data-i18n="capture_analyze">Capture & Analyze</span>
+                    </button>
+                </div>
+
+                <!-- Camera Result -->
+                <div id="camera-result" class="hidden mt-6 p-5 rounded-xl border border-medical-border/50 bg-medical-deeper/50">
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-cyan-400"></i>
+                        <span data-i18n="camera_result">Camera Analysis Result</span>
+                    </h3>
+                    <div id="camera-result-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+{% endblock %}
+{% endblock %}

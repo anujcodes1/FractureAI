@@ -1,0 +1,11 @@
+# FractureAI - Ignore files
+__pycache__/
+*.pyc
+*.pyo
+instance/
+uploads/
+reports/
+.env
+*.h5
+venv/
+.venv/

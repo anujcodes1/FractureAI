@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FractureAI - AI-Powered Bone Fracture Detection System. Upload X-rays for instant AI diagnosis with heatmap visualization.">
+    <title>{% block title %}FractureAI{% endblock %} | AI Bone Fracture Detection</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        accent: { 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7' },
+                        medical: { dark: '#0a0f1e', deeper: '#0d1326', card: '#111827', border: '#1e293b' },
+                        neon: { cyan: '#22d3ee', purple: '#a78bfa', pink: '#f472b6', green: '#34d399' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Orbitron', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'float': 'float 6s ease-in-out infinite',
+                        'scan-line': 'scanLine 2s linear infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px rgba(56, 189, 248, 0.3), 0 0 20px rgba(56, 189, 248, 0.1)' },
+                            '100%': { boxShadow: '0 0 20px rgba(56, 189, 248, 0.6), 0 0 60px rgba(56, 189, 248, 0.2)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        scanLine: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-medical-dark text-gray-200 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- ═══ Background Effects ═══ -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <!-- Grid pattern -->
+        <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(56,189,248,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.3) 1px, transparent 1px); background-size: 60px 60px;"></div>
+        <!-- Gradient orbs -->
+        <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-cyan-500/10 to-purple-500/5 blur-3xl"></div>
+        <div class="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-blue-500/8 to-neon-green/5 blur-3xl"></div>
+    </div>
+
+    <!-- ═══ Navigation Bar ═══ -->
+    <nav id="main-navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between backdrop-blur-xl bg-medical-dark/70 rounded-b-2xl border-b border-medical-border/50 px-6">
+
+                <!-- Logo -->
+                <a href="/" class="flex items-center gap-3 group" id="nav-logo">
+                    <div class="relative w-10 h-10 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl opacity-80 group-hover:opacity-100 transition-opacity animate-pulse-slow"></div>
+                        <i class="fa-solid fa-bone text-white text-lg relative z-10"></i>
+                    </div>
+                    <span class="font-display font-bold text-xl bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                        FractureAI
+                    </span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="/" class="nav-link" id="nav-home">
+                        <i class="fa-solid fa-house-medical mr-1.5"></i>Home
+                    </a>
+                    {% if current_user.is_authenticated %}
+                    <a href="/scan" class="nav-link" id="nav-scan">
+                        <i class="fa-solid fa-x-ray mr-1.5"></i>Scan
+                    </a>
+                    <a href="/dashboard" class="nav-link" id="nav-dashboard">
+                        <i class="fa-solid fa-chart-line mr-1.5"></i>Dashboard
+                    </a>
+                    <a href="/health-score" class="nav-link" id="nav-health">
+                        <i class="fa-solid fa-heart-pulse mr-1.5"></i>Health
+                    </a>
+                    <a href="/clinics" class="nav-link" id="nav-clinics">
+                        <i class="fa-solid fa-hospital mr-1.5"></i>Clinics
+                    </a>
+                    <a href="/appointments" class="nav-link" id="nav-appointments">
+                        <i class="fa-solid fa-calendar-check mr-1.5"></i>Appointments
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Right side: Language + Auth -->
+                <div class="flex items-center gap-3">
+                    <!-- Language Toggle -->
+                    <button id="lang-toggle" onclick="toggleLanguage()" class="p-2 rounded-lg text-gray-400 hover:text-cyan-400 hover:bg-white/5 transition-all" title="Toggle Language">
+                        <i class="fa-solid fa-language text-lg"></i>
+                    </button>
+
+                    <!-- Voice Command -->
+                    {% if current_user.is_authenticated %}
+                    <button id="voice-btn" onclick="startVoiceCommand()" class="p-2 rounded-lg text-gray-400 hover:text-neon-green hover:bg-white/5 transition-all" title="Voice Command">
+                        <i class="fa-solid fa-microphone text-lg"></i>
+                    </button>
+                    {% endif %}
+
+                    {% if current_user.is_authenticated %}
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-400 hidden sm:inline">
+                            <i class="fa-solid fa-user-doctor mr-1"></i>
+                            {{ current_user.full_name or current_user.username }}
+                        </span>
+                        <a href="/logout" id="nav-logout" class="px-4 py-2 rounded-xl text-sm font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition-all">
+                            <i class="fa-solid fa-right-from-bracket mr-1"></i>Logout
+                        </a>
+                    </div>
+                    {% else %}
+                    <a href="/login" id="nav-login" class="px-4 py-2 rounded-xl text-sm font-medium text-cyan-400 hover:bg-cyan-400/10 border border-cyan-400/30 transition-all">
+                        Login
+                    </a>
+                    <a href="/signup" id="nav-signup" class="px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/25 transition-all">
+                        Sign Up
+                    </a>
+                    {% endif %}
+
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-gray-400 hover:text-white" onclick="toggleMobileMenu()">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden mx-4 mt-1 backdrop-blur-xl bg-medical-card/95 rounded-2xl border border-medical-border/50 p-4 shadow-2xl">
+            <a href="/" class="mobile-nav-link"><i class="fa-solid fa-house-medical mr-2"></i><span data-i18n="home">Home</span></a>
+            {% if current_user.is_authenticated %}
+            <a href="/scan" class="mobile-nav-link"><i class="fa-solid fa-x-ray mr-2"></i><span data-i18n="scan">Scan X-Ray</span></a>
+            <a href="/dashboard" class="mobile-nav-link"><i class="fa-solid fa-chart-line mr-2"></i><span data-i18n="dashboard">Dashboard</span></a>
+            <a href="/health-score" class="mobile-nav-link"><i class="fa-solid fa-heart-pulse mr-2"></i>Health Score</a>
+            <a href="/clinics" class="mobile-nav-link"><i class="fa-solid fa-hospital mr-2"></i>Clinics</a>
+            <a href="/appointments" class="mobile-nav-link"><i class="fa-solid fa-calendar-check mr-2"></i>Appointments</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- ═══ Flash Messages ═══ -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="fixed top-20 right-4 z-[60] flex flex-col gap-2 max-w-md" id="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-msg animate-slide-up px-5 py-3 rounded-xl border backdrop-blur-lg shadow-lg flex items-center gap-3
+            {% if category == 'success' %}bg-emerald-500/15 border-emerald-500/30 text-emerald-400
+            {% elif category == 'error' %}bg-red-500/15 border-red-500/30 text-red-400
+            {% elif category == 'warning' %}bg-amber-500/15 border-amber-500/30 text-amber-400
+            {% else %}bg-cyan-500/15 border-cyan-500/30 text-cyan-400{% endif %}">
+            <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'error' %}fa-circle-xmark{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+            <span class="text-sm font-medium">{{ message }}</span>
+            <button onclick="this.parentElement.remove()" class="ml-auto opacity-60 hover:opacity-100">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="flex-1 relative z-10 pt-16">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="relative z-10 mt-auto border-t border-medical-border/30">
+        <div class="mx-auto max-w-7xl px-6 py-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-bone text-cyan-400"></i>
+                    <span class="font-display font-semibold text-sm bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">FractureAI</span>
+                    <span class="text-gray-500 text-xs">© 2026</span>
+                </div>
+                <p class="text-gray-500 text-xs text-center" data-i18n="disclaimer">
+                    AI-powered diagnostic tool. Not a substitute for professional medical advice.
+                </p>
+                <div class="flex gap-4 text-gray-500">
+                    <a href="#" class="hover:text-cyan-400 transition-colors text-sm">Privacy</a>
+                    <a href="#" class="hover:text-cyan-400 transition-colors text-sm">Terms</a>
+                    <a href="#" class="hover:text-cyan-400 transition-colors text-sm">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ═══ Voice Command Overlay ═══ -->
+    <div id="voice-overlay" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div class="bg-medical-card border border-cyan-500/30 rounded-3xl p-10 text-center shadow-2xl animate-fade-in max-w-sm">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center animate-pulse">
+                <i class="fa-solid fa-microphone text-3xl text-white"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2" data-i18n="listening">Listening...</h3>
+            <p class="text-gray-400 text-sm mb-4" id="voice-text" data-i18n="say_command">Say a command...</p>
+            <button onclick="stopVoiceCommand()" class="px-6 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 transition-all text-sm">
+                <i class="fa-solid fa-xmark mr-1"></i>Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ Scripts ═══ -->
+    <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+
+    <script>
+        // Auto-dismiss flash messages after 5 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.flash-msg').forEach(el => {
+                el.style.transition = 'opacity 0.5s, transform 0.5s';
+                el.style.opacity = '0';
+                el.style.transform = 'translateX(100%)';
+                setTimeout(() => el.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
