@@ -194,11 +194,11 @@ def scan_history():
                       .paginate(page=page, per_page=per_page)
 
     return jsonify({
-        "scans": [s.to_dict() for s in scans.items],
-        "total": scans.total,
-        "pages": scans.pages,
-        "current_page": scans.page,
-    })
+            "scans": [s.to_dict() for s in scans.items],
+            "total": scans.total,
+            "pages": scans.pages,
+            "current_page": scans.page,
+        })
 
 
 @api_bp.route("/delete-scan/<int:scan_id>", methods=["DELETE"])
