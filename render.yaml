@@ -1,0 +1,12 @@
+
+
+services:
+  - type: web
+    name: fractureai
+    runtime: python
+    plan: free
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: gunicorn app:create_app()
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
