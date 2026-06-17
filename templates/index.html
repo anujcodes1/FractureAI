@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- ═══════════════════════════════════════════════════════
+     HERO SECTION — Futuristic AI Hospital Landing
+     ═══════════════════════════════════════════════════════ -->
+<section class="relative min-h-[92vh] flex items-center justify-center px-4 overflow-hidden">
+
+    <!-- Animated particles background -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="particle particle-4"></div>
+        <div class="particle particle-5"></div>
+    </div>
+
+    <div class="relative z-10 text-center max-w-5xl mx-auto">
+
+        <!-- Status Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-8 animate-fade-in">
+            <span class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></span>
+            <span class="text-xs font-medium text-cyan-300 tracking-wide" data-i18n="ai_active">AI SYSTEM ACTIVE</span>
+        </div>
+
+        <!-- Main Heading -->
+        <h1 class="text-5xl sm:text-6xl lg:text-8xl font-display font-black mb-6 leading-tight animate-slide-up">
+            <span class="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Fracture
+            </span>
+            <span class="text-white">AI</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-lg sm:text-xl text-gray-400 mb-4 max-w-2xl mx-auto animate-slide-up font-light" style="animation-delay: 0.1s" data-i18n="hero_subtitle">
+            Advanced AI-Powered Bone Fracture Detection System
+        </p>
+        <p class="text-sm text-gray-500 mb-10 max-w-xl mx-auto animate-slide-up" style="animation-delay: 0.2s" data-i18n="hero_desc">
+            Upload your X-ray for instant AI diagnosis with heatmap visualization,
+            severity prediction, and personalized recovery plans.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.3s">
+            {% if current_user.is_authenticated %}
+            <a href="/scan" id="hero-scan-btn" class="group relative px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 transform hover:scale-105">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-x-ray"></i>
+                    <span data-i18n="start_scan">Start AI Scan</span>
+                </span>
+                <div class="absolute inset-0 rounded-2xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </a>
+            <a href="/dashboard" id="hero-dashboard-btn" class="px-8 py-4 rounded-2xl font-semibold text-cyan-400 border border-cyan-400/30 hover:bg-cyan-400/10 transition-all duration-300">
+                <i class="fa-solid fa-chart-line mr-2"></i>
+                <span data-i18n="view_dashboard">View Dashboard</span>
+            </a>
+            {% else %}
+            <a href="/signup" id="hero-signup-btn" class="group relative px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 transform hover:scale-105">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span data-i18n="get_started">Get Started Free</span>
+                </span>
+            </a>
+            <a href="/login" id="hero-login-btn" class="px-8 py-4 rounded-2xl font-semibold text-cyan-400 border border-cyan-400/30 hover:bg-cyan-400/10 transition-all duration-300">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i>
+                <span data-i18n="login">Log In</span>
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Tech stats row -->
+        <div class="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto animate-slide-up" style="animation-delay: 0.5s">
+            <div class="stat-card">
+                <div class="text-2xl font-display font-bold text-cyan-400">99.2%</div>
+                <div class="text-xs text-gray-500 mt-1" data-i18n="accuracy">Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="text-2xl font-display font-bold text-neon-purple">< 3s</div>
+                <div class="text-xs text-gray-500 mt-1" data-i18n="scan_time">Scan Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="text-2xl font-display font-bold text-neon-green">24/7</div>
+                <div class="text-xs text-gray-500 mt-1" data-i18n="availability">Available</div>
+            </div>
+            <div class="stat-card">
+                <div class="text-2xl font-display font-bold text-neon-pink">HIPAA</div>
+                <div class="text-xs text-gray-500 mt-1" data-i18n="compliant">Compliant</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     FEATURES SECTION
+     ═══════════════════════════════════════════════════════ -->
+<section class="py-24 px-4 relative" id="features">
+    <div class="max-w-7xl mx-auto">
+
+        <div class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-display font-bold text-white mb-4" data-i18n="features_title">
+                Powered by Next-Gen AI
+            </h2>
+            <p class="text-gray-400 max-w-xl mx-auto" data-i18n="features_desc">
+                Our deep learning CNN analyzes X-ray images with precision, providing instant and reliable fracture detection.
+            </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Feature 1: Fracture Detection -->
+            <div class="feature-card group" id="feature-detection">
+                <div class="feature-icon bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f1_title">AI Fracture Detection</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f1_desc">
+                    CNN-powered analysis detects bone fractures from X-ray images with high accuracy and confidence scoring.
+                </p>
+            </div>
+
+            <!-- Feature 2: Heatmap -->
+            <div class="feature-card group" id="feature-heatmap">
+                <div class="feature-icon bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20">
+                    <i class="fa-solid fa-fire"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f2_title">Heatmap Visualization</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f2_desc">
+                    Grad-CAM heatmaps highlight exact fracture regions, making AI decisions transparent and explainable.
+                </p>
+            </div>
+
+            <!-- Feature 3: Severity -->
+            <div class="feature-card group" id="feature-severity">
+                <div class="feature-icon bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f3_title">Severity Prediction</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f3_desc">
+                    Classifies fractures as Low, Medium, or High severity with detailed fracture type identification.
+                </p>
+            </div>
+
+            <!-- Feature 4: Camera Scan -->
+            <div class="feature-card group" id="feature-camera">
+                <div class="feature-icon bg-green-500/10 text-green-400 group-hover:bg-green-500/20">
+                    <i class="fa-solid fa-camera"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f4_title">Live Camera Scanning</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f4_desc">
+                    Point your camera at an X-ray film for real-time AI analysis without uploading files.
+                </p>
+            </div>
+
+            <!-- Feature 5: Voice Commands -->
+            <div class="feature-card group" id="feature-voice">
+                <div class="feature-icon bg-pink-500/10 text-pink-400 group-hover:bg-pink-500/20">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f5_title">Voice Commands</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f5_desc">
+                    Navigate hands-free with speech recognition. Say "scan" or "dashboard" to control the app.
+                </p>
+            </div>
+
+            <!-- Feature 6: PDF Reports -->
+            <div class="feature-card group" id="feature-report">
+                <div class="feature-icon bg-red-500/10 text-red-400 group-hover:bg-red-500/20">
+                    <i class="fa-solid fa-file-medical"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f6_title">Smart PDF Reports</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f6_desc">
+                    Auto-generated medical reports with diagnosis, heatmaps, recovery plans, and doctor recommendations.
+                </p>
+            </div>
+
+            <!-- Feature 7: Recovery -->
+            <div class="feature-card group" id="feature-recovery">
+                <div class="feature-icon bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f7_title">Recovery Suggestions</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f7_desc">
+                    Personalized recovery plans including diet, exercises, and timelines based on your specific fracture.
+                </p>
+            </div>
+
+            <!-- Feature 8: Dashboard -->
+            <div class="feature-card group" id="feature-dashboard">
+                <div class="feature-icon bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f8_title">Patient Dashboard</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f8_desc">
+                    Complete history of all scans with analytics, trends, and visual statistics.
+                </p>
+            </div>
+
+            <!-- Feature 9: Multi-language -->
+            <div class="feature-card group" id="feature-language">
+                <div class="feature-icon bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20">
+                    <i class="fa-solid fa-language"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="f9_title">Multi-Language</h3>
+                <p class="text-gray-400 text-sm" data-i18n="f9_desc">
+                    Full English and Hindi support. Switch languages instantly with a single click.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     HOW IT WORKS SECTION
+     ═══════════════════════════════════════════════════════ -->
+<section class="py-24 px-4 relative border-t border-medical-border/20" id="how-it-works">
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl sm:text-4xl font-display font-bold text-white mb-4" data-i18n="how_title">
+                How It Works
+            </h2>
+            <p class="text-gray-400" data-i18n="how_desc">Three simple steps to AI-powered diagnosis</p>
+        </div>
+
+        <div class="grid sm:grid-cols-3 gap-8">
+            <div class="text-center group">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-3xl font-display font-bold text-cyan-400">01</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="step1_title">Upload X-Ray</h3>
+                <p class="text-gray-400 text-sm" data-i18n="step1_desc">Drag & drop or select your X-ray image. Supports PNG, JPG, and JPEG formats.</p>
+            </div>
+
+            <div class="text-center group">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-600/20 border border-purple-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-3xl font-display font-bold text-purple-400">02</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="step2_title">AI Analysis</h3>
+                <p class="text-gray-400 text-sm" data-i18n="step2_desc">Our CNN model analyzes the image, generates a heatmap, and classifies severity in seconds.</p>
+            </div>
+
+            <div class="text-center group">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-500/20 to-emerald-600/20 border border-green-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span class="text-3xl font-display font-bold text-green-400">03</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2" data-i18n="step3_title">Get Results</h3>
+                <p class="text-gray-400 text-sm" data-i18n="step3_desc">View detailed results with heatmap, download PDF report, and get recovery suggestions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ Bottom CTA ═══ -->
+<section class="py-20 px-4">
+    <div class="max-w-3xl mx-auto text-center">
+        <div class="p-10 rounded-3xl bg-gradient-to-br from-medical-card to-medical-deeper border border-medical-border/50 relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5"></div>
+            <div class="relative z-10">
+                <h2 class="text-3xl font-display font-bold text-white mb-4" data-i18n="cta_title">Ready to Scan?</h2>
+                <p class="text-gray-400 mb-8" data-i18n="cta_desc">Start analyzing X-rays with AI in seconds. No credit card required.</p>
+                {% if current_user.is_authenticated %}
+                <a href="/scan" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/30 transition-all transform hover:scale-105">
+                    <i class="fa-solid fa-x-ray"></i>
+                    <span data-i18n="start_scan">Start AI Scan</span>
+                </a>
+                {% else %}
+                <a href="/signup" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/30 transition-all transform hover:scale-105">
+                    <i class="fa-solid fa-rocket"></i>
+                    <span data-i18n="get_started">Get Started Free</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

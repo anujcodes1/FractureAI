@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Scan Result{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-12">
+
+    <!-- Page Header -->
+    <div class="text-center mb-10 animate-fade-in">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4
+            {% if scan.fracture_detected %}bg-red-500/10 border border-red-500/20
+            {% else %}bg-emerald-500/10 border border-emerald-500/20{% endif %}">
+            <i class="fa-solid {% if scan.fracture_detected %}fa-triangle-exclamation text-red-400{% else %}fa-circle-check text-emerald-400{% endif %}"></i>
+            <span class="text-sm font-bold {% if scan.fracture_detected %}text-red-400{% else %}text-emerald-400{% endif %}">
+                {% if scan.fracture_detected %}FRACTURE DETECTED{% else %}NO FRACTURE DETECTED{% endif %}
+            </span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-display font-bold text-white mb-2">
+            <span data-i18n="result_title">Analysis Results</span>
+        </h1>
+        <p class="text-gray-400 text-sm">Scan #{{ scan.id }} • {{ scan.scanned_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+    </div>
+
+    <!-- ═══ Results Grid ═══ -->
+    <div class="grid lg:grid-cols-3 gap-6 mb-8">
+
+        <!-- Confidence Card -->
+        <div class="result-card animate-slide-up">
+            <div class="text-center">
+                <div class="relative w-32 h-32 mx-auto mb-4">
+                    <!-- Circular progress -->
+                    <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="currentColor" stroke-width="8" class="text-medical-border/30"/>
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="url(#confGrad)" stroke-width="8" stroke-linecap="round"
+                                stroke-dasharray="{{ (scan.confidence * 100 * 3.14)|round }}, 314"
+                                class="transition-all duration-1000"/>
+                        <defs>
+                            <linearGradient id="confGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#22d3ee"/>
+                                <stop offset="100%" stop-color="#3b82f6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-2xl font-display font-bold text-white">{{ (scan.confidence * 100)|round(1) }}%</span>
+                    </div>
+                </div>
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider" data-i18n="confidence">Confidence</h3>
+            </div>
+        </div>
+
+        <!-- Severity Card -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.1s">
+            <div class="text-center">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center
+                    {% if scan.severity == 'High' %}bg-red-500/20 border-2 border-red-500/40
+                    {% elif scan.severity == 'Medium' %}bg-amber-500/20 border-2 border-amber-500/40
+                    {% elif scan.severity == 'Low' %}bg-green-500/20 border-2 border-green-500/40
+                    {% else %}bg-gray-500/20 border-2 border-gray-500/40{% endif %}">
+                    <i class="fa-solid fa-gauge-high text-3xl
+                        {% if scan.severity == 'High' %}text-red-400
+                        {% elif scan.severity == 'Medium' %}text-amber-400
+                        {% elif scan.severity == 'Low' %}text-green-400
+                        {% else %}text-gray-400{% endif %}"></i>
+                </div>
+                <h3 class="text-2xl font-display font-bold
+                    {% if scan.severity == 'High' %}text-red-400
+                    {% elif scan.severity == 'Medium' %}text-amber-400
+                    {% elif scan.severity == 'Low' %}text-green-400
+                    {% else %}text-gray-400{% endif %}">{{ scan.severity }}</h3>
+                <p class="text-sm text-gray-400 mt-1" data-i18n="severity">Severity Level</p>
+            </div>
+        </div>
+
+        <!-- Fracture Type Card -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.2s">
+            <div class="text-center">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-purple-500/20 border-2 border-purple-500/40 flex items-center justify-center">
+                    <i class="fa-solid fa-bone text-3xl text-purple-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">{{ scan.fracture_type }}</h3>
+                <p class="text-sm text-gray-400" data-i18n="fracture_type">Fracture Type</p>
+                <p class="text-xs text-gray-500 mt-1">Body Part: {{ scan.body_part }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ X-Ray Images ═══ -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- Original X-Ray -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.3s">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-image text-cyan-400"></i>
+                <span data-i18n="original_xray">Original X-Ray</span>
+            </h3>
+            {% if scan.original_image %}
+            <img src="/uploads/{{ scan.original_image }}" alt="Original X-Ray" class="w-full rounded-xl border border-medical-border/30 shadow-lg">
+            {% else %}
+            <div class="h-64 flex items-center justify-center text-gray-500">No image available</div>
+            {% endif %}
+        </div>
+
+        <!-- Heatmap -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.4s">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-fire text-orange-400"></i>
+                <span data-i18n="ai_heatmap">AI Heatmap (Grad-CAM)</span>
+            </h3>
+            {% if scan.heatmap_image %}
+            <img src="/uploads/{{ scan.heatmap_image }}" alt="AI Heatmap" class="w-full rounded-xl border border-medical-border/30 shadow-lg">
+            <p class="text-xs text-gray-500 mt-3 text-center" data-i18n="heatmap_desc">
+                Red/Yellow regions indicate areas the AI identified as potential fracture zones.
+            </p>
+            {% else %}
+            <div class="h-64 flex items-center justify-center text-gray-500">Heatmap not available</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ═══ Recovery & Doctor Suggestions ═══ -->
+    {% if scan.fracture_detected %}
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- Recovery Suggestions -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.5s">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-heart-pulse text-neon-green"></i>
+                <span data-i18n="recovery_title">AI Recovery Suggestions</span>
+            </h3>
+            <div class="text-sm text-gray-300 whitespace-pre-line leading-relaxed max-h-80 overflow-y-auto custom-scrollbar">
+                {{ scan.recovery_suggestion }}
+            </div>
+        </div>
+
+        <!-- Doctor Recommendations -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.6s">
+            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-user-doctor text-purple-400"></i>
+                <span data-i18n="doctor_title">Recommended Specialists</span>
+            </h3>
+            <div class="text-sm text-gray-300 whitespace-pre-line leading-relaxed max-h-80 overflow-y-auto custom-scrollbar">
+                {{ scan.doctor_recommendation }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ═══ Action Buttons ═══ -->
+    <div class="flex flex-wrap items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.7s">
+        <!-- Download PDF -->
+        {% if scan.report_path %}
+        <a href="/download-report/{{ scan.id }}" id="download-report-btn" class="px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span data-i18n="download_pdf">Download PDF Report</span>
+        </a>
+        {% endif %}
+
+        <!-- Clinical Suggestions -->
+        <a href="/clinical-suggestions/{{ scan.id }}" class="px-6 py-3 rounded-xl font-semibold text-blue-400 border border-blue-400/30 hover:bg-blue-400/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-stethoscope"></i>
+            <span>Clinical Suggestions</span>
+        </a>
+
+        <!-- Email Report -->
+        <form method="POST" action="/email-report/{{ scan.id }}" class="inline">
+            <button type="submit" id="email-report-btn" class="px-6 py-3 rounded-xl font-semibold text-purple-400 border border-purple-400/30 hover:bg-purple-400/10 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-envelope"></i>
+                <span data-i18n="email_report">Email Report</span>
+            </button>
+        </form>
+
+        <!-- Find Clinics -->
+        <a href="/clinics" class="px-6 py-3 rounded-xl font-semibold text-amber-400 border border-amber-400/30 hover:bg-amber-400/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-hospital"></i>
+            <span>Find Clinics</span>
+        </a>
+
+        <!-- Book Appointment -->
+        <a href="/appointments" class="px-6 py-3 rounded-xl font-semibold text-pink-400 border border-pink-400/30 hover:bg-pink-400/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus"></i>
+            <span>Book Appointment</span>
+        </a>
+
+        <!-- New Scan -->
+        <a href="/scan" id="new-scan-btn" class="px-6 py-3 rounded-xl font-semibold text-neon-green border border-neon-green/30 hover:bg-neon-green/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            <span data-i18n="new_scan">New Scan</span>
+        </a>
+
+        <!-- Dashboard -->
+        <a href="/dashboard" class="px-6 py-3 rounded-xl font-semibold text-gray-400 border border-gray-600/30 hover:bg-gray-600/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-chart-line"></i>
+            <span data-i18n="to_dashboard">Dashboard</span>
+        </a>
+    </div>
+
+    <!-- ═══ Disclaimer ═══ -->
+    <div class="mt-10 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 text-center animate-fade-in">
+        <p class="text-amber-400/80 text-xs">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+            <span data-i18n="result_disclaimer">
+                AI-generated results are for informational purposes only. Always consult a qualified healthcare professional for medical diagnosis and treatment.
+            </span>
+        </p>
+    </div>
+</section>
+{% endblock %}

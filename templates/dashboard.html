@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 py-12">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10 gap-4 animate-fade-in">
+        <div>
+            <h1 class="text-3xl sm:text-4xl font-display font-bold text-white mb-2">
+                <i class="fa-solid fa-chart-line text-cyan-400 mr-2"></i>
+                <span data-i18n="dashboard_title">Patient Dashboard</span>
+            </h1>
+            <p class="text-gray-400" data-i18n="dashboard_subtitle">Your complete scan history and analytics</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="/health-score" class="px-4 py-2.5 rounded-xl font-semibold text-neon-green border border-neon-green/30 hover:bg-neon-green/10 transition-all flex items-center gap-2 text-sm">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <span>Health Score</span>
+            </a>
+            <a href="/appointments" class="px-4 py-2.5 rounded-xl font-semibold text-purple-400 border border-purple-400/30 hover:bg-purple-400/10 transition-all flex items-center gap-2 text-sm">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Appointments</span>
+            </a>
+            <a href="/scan" class="px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i>
+                <span data-i18n="new_scan">New Scan</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ═══ Stats Cards ═══ -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div class="stat-dashboard-card animate-slide-up">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-x-ray text-cyan-400"></i>
+                </div>
+                <span class="text-xs text-gray-500">Total</span>
+            </div>
+            <div class="text-3xl font-display font-bold text-white">{{ stats.total_scans }}</div>
+            <div class="text-xs text-gray-500 mt-1" data-i18n="total_scans">Total Scans</div>
+        </div>
+
+        <div class="stat-dashboard-card animate-slide-up" style="animation-delay: 0.1s">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-bone text-red-400"></i>
+                </div>
+                <span class="text-xs text-red-400">⚠</span>
+            </div>
+            <div class="text-3xl font-display font-bold text-red-400">{{ stats.fractures_detected }}</div>
+            <div class="text-xs text-gray-500 mt-1" data-i18n="fractures_found">Fractures Found</div>
+        </div>
+
+        <div class="stat-dashboard-card animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                </div>
+                <span class="text-xs text-emerald-400">✓</span>
+            </div>
+            <div class="text-3xl font-display font-bold text-emerald-400">{{ stats.normal_scans }}</div>
+            <div class="text-xs text-gray-500 mt-1" data-i18n="normal_scans">Normal Scans</div>
+        </div>
+
+        <div class="stat-dashboard-card animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between mb-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-chart-pie text-purple-400"></i>
+                </div>
+                <span class="text-xs text-gray-500">Avg.</span>
+            </div>
+            <div class="text-3xl font-display font-bold text-purple-400">{{ stats.avg_confidence }}%</div>
+            <div class="text-xs text-gray-500 mt-1" data-i18n="avg_confidence">Avg. Confidence</div>
+        </div>
+    </div>
+
+    <!-- ═══ Severity Distribution ═══ -->
+    <div class="grid md:grid-cols-3 gap-4 mb-10">
+        <div class="severity-bar animate-slide-up" style="animation-delay: 0.4s">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-green-400 flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved"></i> Low Severity
+                </span>
+                <span class="text-sm font-display font-bold text-green-400">{{ stats.severity_counts.Low }}</span>
+            </div>
+            <div class="h-2 rounded-full bg-medical-border/30 overflow-hidden">
+                {% set low_pct = (stats.severity_counts.Low / stats.total_scans * 100) if stats.total_scans > 0 else 0 %}
+                <div class="severity-progress h-full rounded-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-1000" data-width="{{ low_pct }}"></div>
+            </div>
+        </div>
+
+        <div class="severity-bar animate-slide-up" style="animation-delay: 0.5s">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Medium Severity
+                </span>
+                <span class="text-sm font-display font-bold text-amber-400">{{ stats.severity_counts.Medium }}</span>
+            </div>
+            <div class="h-2 rounded-full bg-medical-border/30 overflow-hidden">
+                {% set med_pct = (stats.severity_counts.Medium / stats.total_scans * 100) if stats.total_scans > 0 else 0 %}
+                <div class="severity-progress h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000" data-width="{{ med_pct }}"></div>
+            </div>
+        </div>
+
+        <div class="severity-bar animate-slide-up" style="animation-delay: 0.6s">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-red-400 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation"></i> High Severity
+                </span>
+                <span class="text-sm font-display font-bold text-red-400">{{ stats.severity_counts.High }}</span>
+            </div>
+            <div class="h-2 rounded-full bg-medical-border/30 overflow-hidden">
+                {% set high_pct = (stats.severity_counts.High / stats.total_scans * 100) if stats.total_scans > 0 else 0 %}
+                <div class="severity-progress h-full rounded-full bg-gradient-to-r from-red-500 to-rose-400 transition-all duration-1000" data-width="{{ high_pct }}"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Scan History Table ═══ -->
+    <div class="bg-medical-card/60 backdrop-blur-xl border border-medical-border/50 rounded-3xl overflow-hidden animate-slide-up" style="animation-delay: 0.7s">
+        <div class="p-6 border-b border-medical-border/30">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i>
+                <span data-i18n="scan_history">Scan History</span>
+            </h2>
+        </div>
+
+        {% if scans %}
+        <div class="overflow-x-auto">
+            <table class="w-full" id="scan-history-table">
+                <thead>
+                    <tr class="border-b border-medical-border/20">
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="date">Date</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="body_part">Body Part</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="result">Result</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="confidence">Confidence</th>
+                        <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="severity">Severity</th>
+                        <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" data-i18n="actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in scans %}
+                    <tr class="border-b border-medical-border/10 hover:bg-white/[0.02] transition-colors" id="scan-row-{{ scan.id }}">
+                        <td class="px-6 py-4 text-sm text-gray-400">{{ scan.id }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-300">{{ scan.scanned_at.strftime('%b %d, %Y') }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-300">{{ scan.body_part }}</td>
+                        <td class="px-6 py-4">
+                            {% if scan.fracture_detected %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/20">
+                                <i class="fa-solid fa-circle-exclamation"></i> Fracture
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                                <i class="fa-solid fa-circle-check"></i> Normal
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-mono text-cyan-400">{{ (scan.confidence * 100)|round(1) }}%</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold
+                                {% if scan.severity == 'High' %}bg-red-500/15 text-red-400
+                                {% elif scan.severity == 'Medium' %}bg-amber-500/15 text-amber-400
+                                {% elif scan.severity == 'Low' %}bg-green-500/15 text-green-400
+                                {% else %}bg-gray-500/15 text-gray-400{% endif %}">
+                                {{ scan.severity }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="/result/{{ scan.id }}" class="p-2 rounded-lg text-cyan-400 hover:bg-cyan-400/10 transition-colors" title="View Details">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a href="/clinical-suggestions/{{ scan.id }}" class="p-2 rounded-lg text-blue-400 hover:bg-blue-400/10 transition-colors" title="Clinical Suggestions">
+                                    <i class="fa-solid fa-stethoscope"></i>
+                                </a>
+                                {% if scan.report_path %}
+                                <a href="/download-report/{{ scan.id }}" class="p-2 rounded-lg text-purple-400 hover:bg-purple-400/10 transition-colors" title="Download PDF">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </a>
+                                {% endif %}
+                                <button class="btn-delete-scan p-2 rounded-lg text-red-400 hover:bg-red-400/10 transition-colors" data-scan-id="{{ scan.id }}" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-12 text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
+                <i class="fa-solid fa-x-ray text-3xl text-gray-600"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-400 mb-2" data-i18n="no_scans">No scans yet</h3>
+            <p class="text-gray-500 text-sm mb-6" data-i18n="no_scans_desc">Upload your first X-ray to get started with AI diagnosis.</p>
+            <a href="/scan" class="px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 transition-all inline-flex items-center gap-2">
+                <i class="fa-solid fa-x-ray"></i>
+                <span data-i18n="first_scan">Start First Scan</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+    // Set severity bar widths from data attributes
+    document.querySelectorAll('.severity-progress').forEach(function(bar) {
+        var w = bar.getAttribute('data-width');
+        if (w) { bar.style.width = w + '%'; }
+    });
+
+    // Delete scan via event delegation
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.btn-delete-scan');
+        if (!btn) return;
+        var scanId = btn.getAttribute('data-scan-id');
+        if (!confirm('Are you sure you want to delete this scan? This cannot be undone.')) return;
+
+        fetch('/api/delete-scan/' + scanId, { method: 'DELETE' })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    var row = document.getElementById('scan-row-' + scanId);
+                    if (row) {
+                        row.style.transition = 'opacity 0.3s, transform 0.3s';
+                        row.style.opacity = '0';
+                        row.style.transform = 'translateX(50px)';
+                        setTimeout(function() { row.remove(); }, 300);
+                    }
+                } else {
+                    alert('Failed to delete scan.');
+                }
+            })
+            .catch(function() {
+                alert('Error deleting scan.');
+            });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Clinical Suggestions{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-12">
+
+    <!-- Page Header -->
+    <div class="text-center mb-10 animate-fade-in">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4">
+            <i class="fa-solid fa-stethoscope text-blue-400"></i>
+            <span class="text-sm font-bold text-blue-400">CLINICAL ANALYSIS</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-display font-bold text-white mb-2">
+            Clinical Suggestions
+        </h1>
+        <p class="text-gray-400 text-sm">Scan #{{ scan.id }} &bull; {{ scan.scanned_at.strftime('%B %d, %Y at %I:%M %p') }} &bull; {{ scan.body_part }}</p>
+    </div>
+
+    <!-- ═══ Scan Summary Banner ═══ -->
+    <div class="result-card animate-slide-up mb-8">
+        <div class="flex flex-col sm:flex-row items-center gap-6">
+            <div class="w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0
+                {% if scan.fracture_detected %}bg-red-500/15 border-2 border-red-500/30
+                {% else %}bg-emerald-500/15 border-2 border-emerald-500/30{% endif %}">
+                <i class="fa-solid {% if scan.fracture_detected %}fa-bone text-red-400{% else %}fa-circle-check text-emerald-400{% endif %} text-3xl"></i>
+            </div>
+            <div class="flex-1 text-center sm:text-left">
+                <h2 class="text-xl font-bold {% if scan.fracture_detected %}text-red-400{% else %}text-emerald-400{% endif %} mb-1">
+                    {% if scan.fracture_detected %}Fracture Detected — {{ scan.fracture_type }}{% else %}No Fracture Detected{% endif %}
+                </h2>
+                <p class="text-gray-400 text-sm">
+                    Confidence: <span class="font-mono text-cyan-400">{{ (scan.confidence * 100)|round(1) }}%</span>
+                    &bull; Severity: <span class="font-bold
+                        {% if scan.severity == 'High' %}text-red-400
+                        {% elif scan.severity == 'Medium' %}text-amber-400
+                        {% elif scan.severity == 'Low' %}text-green-400
+                        {% else %}text-gray-400{% endif %}">{{ scan.severity }}</span>
+                    &bull; Body Part: <span class="text-white">{{ scan.body_part }}</span>
+                </p>
+            </div>
+            {% if scan.report_path %}
+            <a href="/download-report/{{ scan.id }}" class="px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 transition-all flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-file-pdf"></i>
+                <span>Download PDF</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ═══ Clinical Suggestion Cards ═══ -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+
+        <!-- Immediate Actions -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.1s">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-bolt text-red-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Immediate Actions</h3>
+                    <p class="text-xs text-gray-500">Priority steps to take now</p>
+                </div>
+            </div>
+            <ul class="space-y-3">
+                {% for action in suggestions.immediate_actions %}
+                <li class="flex items-start gap-3">
+                    <div class="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span class="text-xs text-red-400 font-bold">{{ loop.index }}</span>
+                    </div>
+                    <span class="text-sm text-gray-300">{{ action }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Follow-Up Care -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-calendar-check text-cyan-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Follow-Up Care</h3>
+                    <p class="text-xs text-gray-500">Ongoing monitoring plan</p>
+                </div>
+            </div>
+            <ul class="space-y-3">
+                {% for item in suggestions.follow_up %}
+                <li class="flex items-start gap-3">
+                    <div class="w-5 h-5 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="fa-solid fa-check text-cyan-400 text-[10px]"></i>
+                    </div>
+                    <span class="text-sm text-gray-300">{{ item }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Precautions -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-amber-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Precautions</h3>
+                    <p class="text-xs text-gray-500">Safety measures to follow</p>
+                </div>
+            </div>
+            <ul class="space-y-3">
+                {% for item in suggestions.precautions %}
+                <li class="flex items-start gap-3">
+                    <div class="w-5 h-5 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-[10px]"></i>
+                    </div>
+                    <span class="text-sm text-gray-300">{{ item }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Rehabilitation -->
+        <div class="result-card animate-slide-up" style="animation-delay: 0.4s">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center">
+                    <i class="fa-solid fa-dumbbell text-green-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Rehabilitation</h3>
+                    <p class="text-xs text-gray-500">Recovery exercise guidance</p>
+                </div>
+            </div>
+            <ul class="space-y-3">
+                {% for item in suggestions.rehabilitation %}
+                <li class="flex items-start gap-3">
+                    <div class="w-5 h-5 rounded-full bg-green-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="fa-solid fa-check text-green-400 text-[10px]"></i>
+                    </div>
+                    <span class="text-sm text-gray-300">{{ item }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══ Lifestyle Recommendations ═══ -->
+    <div class="result-card animate-slide-up mb-8" style="animation-delay: 0.5s">
+        <div class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                <i class="fa-solid fa-heart-pulse text-purple-400"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Lifestyle & Nutrition</h3>
+                <p class="text-xs text-gray-500">Diet and lifestyle changes for optimal recovery</p>
+            </div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+            {% for item in suggestions.lifestyle %}
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-medical-border/20">
+                <div class="w-6 h-6 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i class="fa-solid fa-leaf text-purple-400 text-xs"></i>
+                </div>
+                <p class="text-sm text-gray-300">{{ item }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ═══ Action Buttons ═══ -->
+    <div class="flex flex-wrap items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.6s">
+        {% if scan.report_path %}
+        <a href="/download-report/{{ scan.id }}" class="px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/25 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>Download PDF Report</span>
+        </a>
+        {% endif %}
+        <a href="/clinics" class="px-6 py-3 rounded-xl font-semibold text-neon-green border border-neon-green/30 hover:bg-neon-green/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-hospital"></i>
+            <span>Find Nearby Clinics</span>
+        </a>
+        <a href="/appointments" class="px-6 py-3 rounded-xl font-semibold text-purple-400 border border-purple-400/30 hover:bg-purple-400/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus"></i>
+            <span>Book Appointment</span>
+        </a>
+        <a href="/result/{{ scan.id }}" class="px-6 py-3 rounded-xl font-semibold text-gray-400 border border-gray-600/30 hover:bg-gray-600/10 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Results</span>
+        </a>
+    </div>
+
+    <!-- ═══ Disclaimer ═══ -->
+    <div class="mt-10 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 text-center animate-fade-in">
+        <p class="text-amber-400/80 text-xs">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+            These clinical suggestions are AI-generated and for informational purposes only. Always consult a qualified healthcare professional for medical diagnosis, treatment plans, and prescriptions.
+        </p>
+    </div>
+
+</section>
+{% endblock %}

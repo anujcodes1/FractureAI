@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<section class="min-h-[85vh] flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md animate-fade-in">
+
+        <!-- Signup Card -->
+        <div class="bg-medical-card/80 backdrop-blur-xl border border-medical-border/50 rounded-3xl p-8 shadow-2xl">
+
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    <i class="fa-solid fa-user-plus text-2xl text-white"></i>
+                </div>
+                <h1 class="text-2xl font-display font-bold text-white" data-i18n="signup_title">Create Account</h1>
+                <p class="text-gray-400 text-sm mt-1" data-i18n="signup_subtitle">Join FractureAI for free AI diagnostics</p>
+            </div>
+
+            <!-- Signup Form -->
+            <form method="POST" action="/signup" class="space-y-4" id="signup-form">
+                <!-- Full Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5" data-i18n="full_name">Full Name</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" name="full_name" id="signup-fullname"
+                               class="input-field pl-11"
+                               placeholder="Dr. John Doe">
+                    </div>
+                </div>
+
+                <!-- Username -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5" data-i18n="username">Username</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" name="username" id="signup-username" required minlength="3"
+                               class="input-field pl-11"
+                               placeholder="Choose a username">
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5" data-i18n="email">Email</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="email" name="email" id="signup-email" required
+                               class="input-field pl-11"
+                               placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5" data-i18n="password">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="password" name="password" id="signup-password" required minlength="6"
+                               class="input-field pl-11"
+                               placeholder="Min 6 characters">
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5" data-i18n="confirm_password">Confirm Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-shield-halved absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="password" name="confirm_password" id="signup-confirm" required minlength="6"
+                               class="input-field pl-11"
+                               placeholder="Re-enter password">
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" id="signup-submit-btn" class="w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-300 transform hover:scale-[1.02] mt-2">
+                    <i class="fa-solid fa-user-plus mr-2"></i>
+                    <span data-i18n="create_account">Create Account</span>
+                </button>
+            </form>
+
+            <!-- Login Link -->
+            <p class="text-center text-sm text-gray-400 mt-6">
+                <span data-i18n="has_account">Already have an account?</span>
+                <a href="/login" class="text-purple-400 hover:text-purple-300 font-medium ml-1" data-i18n="login_link">Sign in</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
