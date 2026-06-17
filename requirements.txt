@@ -8,7 +8,7 @@ Flask-Login>=0.6
 Flask-Mail>=0.10
 
 # AI / Machine Learning
-tensorflow>=2.16
+tensorflow-cpu==2.16.1
 numpy>=1.26
 Pillow>=10.0
 scipy>=1.12
